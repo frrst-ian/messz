@@ -9,8 +9,37 @@ datasource db {
 }
 
 model User {
-  id Int @id @default(autoincrement())
-  email String @unique
-  name String
-  password String
-} 
+  id                         Int            @id @default(autoincrement())
+  fullName                   String?
+  email                      String         @unique
+  pfp                        String?
+  password                   String?
+  bio                        String?
+  conversations              Conversation[]
+  conversationsAsParticipant Conversation[] @relation(name: "participant")
+  messages                   Message[]
+}
+
+model Conversation {
+  id            Int  @id @default(autoincrement())
+  userId        Int
+  user          User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  participantId Int
+  participant   User @relation(fields: [participantId], references: [id], name: "participant", onDelete: Cascade)
+  messages       Message[]
+  seen           Boolean   @default(false)
+  unseenMessages Int       @default(0)
+  createdAt      DateTime  @default(now())
+
+  @@unique([userId, participantId])
+}
+
+model Message {
+  id              Int          @id @default(autoincrement())
+  converstationId Int
+  conversation    Conversation @relation(fields: [converstationId], references: [id], onDelete: Cascade)
+  senderId        Int
+  sender          User         @relation(fields: [senderId], references: [id])
+  content         String
+  sentAt          DateTime     @default(now())
+}
