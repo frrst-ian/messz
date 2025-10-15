@@ -50,9 +50,8 @@ model Message {
 
 model Profile {
   id         Int     @id @default(autoincrement())
-  displaName String?
+  displayName String?
   pfp        String?
-  password   String?
   bio        String?
   userId     Int     @unique
   profile    User    @relation(fields: [userId], references: [id])

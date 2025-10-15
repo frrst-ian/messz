@@ -87,7 +87,11 @@ async function deleteConversation(conversationId) {
     });
 }
 
-async function getProfile(profileId) {
+async function getProfiles() {
+    return await prisma.profile.findMany();
+}
+
+async function getProfileById(profileId) {
     return await prisma.profile.findUnique({
         where: {
             id: profileId,
@@ -96,9 +100,10 @@ async function getProfile(profileId) {
 }
 
 async function createProfile(userId, displayName, bio, pfp) {
+    // console.log("bio: " , bio)
     return await prisma.profile.create({
         data: {
-            userId:userId,
+            userId: userId,
             displayName: displayName,
             bio: bio,
             pfp: pfp,
@@ -107,12 +112,12 @@ async function createProfile(userId, displayName, bio, pfp) {
 }
 
 async function updateProfile(profileId, displayName, bio, pfp) {
+    console.log("profileId:" , profileId)
     return await prisma.profile.update({
         where: {
             id: profileId,
         },
         data: {
-            id: profileId,
             displayName: displayName,
             bio: bio,
             pfp: pfp,
@@ -129,7 +134,8 @@ module.exports = {
     createConversation,
     updateConversationStatus,
     deleteConversation,
-    getProfile,
+    getProfileById,
     updateProfile,
     createProfile,
+    getProfiles,
 };
