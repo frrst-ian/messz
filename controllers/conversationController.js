@@ -136,7 +136,4 @@ module.exports = {
     getConversationById,
     updateConversationStatus,
     deleteConversation,
-    getProfile,
-    createProfile,
-    updateProfile,
 };
