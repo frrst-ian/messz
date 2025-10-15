@@ -13,7 +13,10 @@ async function createConversation(req, res) {
     const { participantId } = req.body;
     console.log("participantId: ", participantId);
 
-    const conversation = await db.createConversation(userId, participantId);
+    const conversation = await db.createConversation(
+        Number(userId),
+        Number(participantId),
+    );
     return res.json(conversation);
 }
 
@@ -44,8 +47,9 @@ async function updateConversationStatus(req, res) {
     console.log("convo: ", conversation);
 
     if (!seen) {
-        const updatedConversaton =
-            await db.updateConversationStatus(Number(conversation.id));
+        const updatedConversaton = await db.updateConversationStatus(
+            Number(conversation.id),
+        );
         console.log("updated convo: ", updatedConversaton);
 
         return res.json(updatedConversaton);
@@ -54,9 +58,28 @@ async function updateConversationStatus(req, res) {
     return res.json(conversation);
 }
 
+async function deleteConversation(req, res) {
+    const userId = req.user.id;
+    console.log("userId: ", userId);
+    const { participantId } = req.body;
+    console.log("participantId: ", participantId);
+
+    const conversation = await db.getConversationById(
+        Number(userId),
+        Number(participantId),
+    );
+    console.log("convo: ", conversation);
+
+    await db.deleteConversation(Number(conversation.id));
+
+    const conversations = db.getConversations(userId);
+    return res.json(conversations);
+}
+
 module.exports = {
     getConversations,
     createConversation,
     getConversationById,
     updateConversationStatus,
+    deleteConversation,
 };

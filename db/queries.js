@@ -79,6 +79,14 @@ async function updateConversationStatus(conversationId) {
     });
 }
 
+async function deleteConversation(conversationId) {
+    return await prisma.conversation.delete({
+        where: {
+            id: conversationId,
+        },
+    });
+}
+
 module.exports = {
     createUser,
     getUserById,
@@ -87,4 +95,5 @@ module.exports = {
     getConversationById,
     createConversation,
     updateConversationStatus,
+    deleteConversation,
 };
