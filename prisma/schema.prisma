@@ -12,21 +12,21 @@ model User {
   id                         Int            @id @default(autoincrement())
   fullName                   String?
   email                      String         @unique
-  pfp                        String?
   password                   String?
-  bio                        String?
   conversations              Conversation[]
   conversationsAsParticipant Conversation[] @relation(name: "participant")
   messages                   Message[]
+  Profile                    Profile?
+
   @@map("user")
 }
 
 model Conversation {
-  id            Int  @id @default(autoincrement())
-  userId        Int
-  user          User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  participantId Int
-  participant   User @relation(fields: [participantId], references: [id], name: "participant", onDelete: Cascade)
+  id             Int       @id @default(autoincrement())
+  userId         Int
+  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  participantId  Int
+  participant    User      @relation(fields: [participantId], references: [id], name: "participant", onDelete: Cascade)
   messages       Message[]
   seen           Boolean   @default(false)
   unseenMessages Int       @default(0)
@@ -44,5 +44,16 @@ model Message {
   sender          User         @relation(fields: [senderId], references: [id])
   content         String
   sentAt          DateTime     @default(now())
+
   @@map("message")
+}
+
+model Profile {
+  id         Int     @id @default(autoincrement())
+  displaName String?
+  pfp        String?
+  password   String?
+  bio        String?
+  userId     Int     @unique
+  profile    User    @relation(fields: [userId], references: [id])
 }

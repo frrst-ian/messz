@@ -1,5 +1,7 @@
 const db = require("../db/queries");
 
+// add error handling later - id validaton
+
 async function getConversations(req, res) {
     const userId = req.user.id;
     const conversations = await db.getConversations(userId);
@@ -76,10 +78,50 @@ async function deleteConversation(req, res) {
     return res.json(conversations);
 }
 
+async function getProfile(req, res) {
+    const userId = req.user.id;
+    const profile = await db.getProfile(userId);
+    console.log("Profile:  ", profile);
+    res.json(profile);
+}
+
+async function createProfile(req, res) {
+    const userId = req.user.id;
+    const { name, bio, pfp } = req.body;
+
+    const profile = await db.createProfile(Number(userId), name, bio, pfp);
+
+    console.log("profile created:", profile);
+    res.json(profile);
+}
+
+async function updateProfile(req, res) {
+    const profileId = req.params.id;
+    console.log("Post id:  ", profileId);
+    const { displayName, bio, pfp } = req.body;
+
+    // const profile = await db.getProfileById(profileId);
+    const updateData = {};
+
+    if (displayName !== undefined) updateData.displayName = displayName;
+    if (bio !== undefined) updateData.bio = bio;
+    if (pfp !== undefined) updateData.pfp = pfp;
+
+    if (Object.keys(updateData).length === 0) {
+        return res.json({ error: "No fields to update" });
+    }
+
+    const newProfile = await db.updateProfile(displayName, bio, pfp);
+    return res.json(newProfile);
+}
+
 module.exports = {
     getConversations,
     createConversation,
     getConversationById,
     updateConversationStatus,
     deleteConversation,
+    getProfile,
+    createProfile,
+    updateProfile,
 };
