@@ -87,6 +87,39 @@ async function deleteConversation(conversationId) {
     });
 }
 
+async function getProfile(profileId) {
+    return await prisma.profile.findUnique({
+        where: {
+            id: profileId,
+        },
+    });
+}
+
+async function createProfile(userId, displayName, bio, pfp) {
+    return await prisma.profile.create({
+        data: {
+            userId:userId,
+            displayName: displayName,
+            bio: bio,
+            pfp: pfp,
+        },
+    });
+}
+
+async function updateProfile(profileId, displayName, bio, pfp) {
+    return await prisma.profile.update({
+        where: {
+            id: profileId,
+        },
+        data: {
+            id: profileId,
+            displayName: displayName,
+            bio: bio,
+            pfp: pfp,
+        },
+    });
+}
+
 module.exports = {
     createUser,
     getUserById,
@@ -96,4 +129,7 @@ module.exports = {
     createConversation,
     updateConversationStatus,
     deleteConversation,
+    getProfile,
+    updateProfile,
+    createProfile,
 };

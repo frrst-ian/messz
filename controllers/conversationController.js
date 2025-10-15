@@ -79,8 +79,9 @@ async function deleteConversation(req, res) {
 }
 
 async function getProfile(req, res) {
-    const userId = req.user.id;
-    const profile = await db.getProfile(userId);
+    const profileId = req.params.id;
+    csonsole.log("Profile Id: " , profileId)
+    const profile = await db.getProfile(Number(profileId));
     console.log("Profile:  ", profile);
     res.json(profile);
 }
