@@ -26,4 +26,65 @@ async function getUserByEmail(email) {
     });
 }
 
-module.exports = { createUser, getUserById, getUserByEmail };
+async function getConversations(userId, participantId) {
+    return await prisma.conversation.findMany({
+        where: {
+            OR: [{ userId: userId }, { participantId: participantId }],
+        },
+        include: {
+            user: true,
+            participant: true,
+            messages: {
+                orderBy: { sentAt: "desc" },
+                take: 1,
+            },
+        },
+        orderBy: { createdAt: "desc" },
+    });
+}
+
+async function getConversationById(userId, participantId) {
+    return await prisma.conversation.findUnique({
+        where: {
+            userId_participantId: {
+                userId: userId,
+                participantId: participantId,
+            },
+        },
+        include: {
+            messages: {
+                orderBy: { sentAt: "desc" },
+            },
+        },
+    });
+}
+
+async function createConversation(userId, participantId) {
+    return await prisma.conversation.create({
+        data: {
+            userId: userId,
+            participantId: participantId,
+        },
+    });
+}
+
+async function updateConversationStatus(conversationId) {
+    return await prisma.conversation.update({
+        where: {
+            id: conversationId,
+        },
+        data: {
+            seen: true,
+        },
+    });
+}
+
+module.exports = {
+    createUser,
+    getUserById,
+    getUserByEmail,
+    getConversations,
+    getConversationById,
+    createConversation,
+    updateConversationStatus,
+};

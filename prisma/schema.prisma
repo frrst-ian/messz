@@ -18,6 +18,7 @@ model User {
   conversations              Conversation[]
   conversationsAsParticipant Conversation[] @relation(name: "participant")
   messages                   Message[]
+  @@map("user")
 }
 
 model Conversation {
@@ -32,6 +33,7 @@ model Conversation {
   createdAt      DateTime  @default(now())
 
   @@unique([userId, participantId])
+  @@map("conversation")
 }
 
 model Message {
@@ -42,4 +44,5 @@ model Message {
   sender          User         @relation(fields: [senderId], references: [id])
   content         String
   sentAt          DateTime     @default(now())
+  @@map("message")
 }

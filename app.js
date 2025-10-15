@@ -5,12 +5,12 @@ const express = require("express");
 const app = express();
 
 const authRouter = require("./routes/authRouter");
-const messageRouter = require("./routes/messageRouter");
+const conversationRouter = require("./routes/conversationRouter");
 
 app.use(express.json());
 
 app.use("/api/auth", authRouter);
-app.use("/api/message", messageRouter);
+app.use("/api/conversations", conversationRouter);
 
 
 // app.get("/api/profile", authenticateJwt , (req, res) => {

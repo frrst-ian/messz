@@ -9,11 +9,13 @@ passport.use(
     new LocalStrategy(
         {
             usernameField: "email",
+            passReqToCallback: true,
         },
-        async (email, password, done) => {
+        async (req, email, password, done) => {
             try {
                 const user = await db.getUserByEmail(email);
-                // console.log("user from passport.js: " , user )
+                req.user = user;
+
                 if (!user) {
                     return done(null, false, {
                         error: "Invalid email",
