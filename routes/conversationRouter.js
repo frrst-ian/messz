@@ -7,7 +7,7 @@ conversationRouter.get("/", authenticateJwt, conversationController.getConversat
 conversationRouter.post("/",authenticateJwt, conversationController.createConversation);
 conversationRouter.put("/",authenticateJwt, conversationController.updateConversationStatus);
 conversationRouter.delete("/",authenticateJwt, conversationController.deleteConversation);
-
-// conversationRouter.get("/:conversationId/", conversationController.getConversationById);
+conversationRouter.get("/:id", authenticateJwt, conversationController.getConversationById);
+conversationRouter.post("/:id/messages", authenticateJwt, conversationController.createMessage);
 
 module.exports = conversationRouter;

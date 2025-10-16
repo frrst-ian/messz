@@ -112,7 +112,7 @@ async function createProfile(userId, displayName, bio, pfp) {
 }
 
 async function updateProfile(profileId, displayName, bio, pfp) {
-    console.log("profileId:" , profileId)
+    console.log("profileId:", profileId);
     return await prisma.profile.update({
         where: {
             id: profileId,
@@ -121,6 +121,26 @@ async function updateProfile(profileId, displayName, bio, pfp) {
             displayName: displayName,
             bio: bio,
             pfp: pfp,
+        },
+    });
+}
+
+async function createMessage(content, conversationId, senderId) {
+    return await prisma.message.create({
+        data: {
+            conversationId: conversationId,
+            content: content,
+            senderId: senderId,
+        },
+        include: {
+            sender: {
+                select: {
+                    id: true,
+                    fullName: true,
+                    email: true,
+                },
+            },
+            conversation: true,
         },
     });
 }
@@ -138,4 +158,5 @@ module.exports = {
     updateProfile,
     createProfile,
     getProfiles,
+    createMessage,
 };
