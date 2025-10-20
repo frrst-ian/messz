@@ -15,13 +15,13 @@ async function getProfileById(req, res) {
     try {
         const profileId = req.params.id;
         console.log("Profile Id: ", profileId);
-        if(isNaN(profileId)){
-            return res.status(400).json({error: "400 Bad Request"});
+        if (isNaN(profileId)) {
+            return res.status(400).json({ error: "400 Bad Request" });
         }
         const profile = await db.getProfileById(Number(profileId));
         console.log("Profile:  ", profile);
-        if(profile === null) {
-            return res.status(404).json({error: "404 Profile Not Found"})
+        if (profile === null) {
+            return res.status(404).json({ error: "404 Profile Not Found" });
         }
         res.json(profile);
     } catch (err) {
@@ -32,10 +32,17 @@ async function getProfileById(req, res) {
 
 async function createProfile(req, res) {
     try {
-        const userId = 4;
-        const { displayName, bio, pfp } = req.body;
+        const userId = req.user.id;
+        console.log("req : ", req);
+        console.log("req.body: ", req.body);
+        
+        const { bio } = req.body;
         // console.log("body: ", req.body);
-        const profile = await db.createProfile(Number(userId), displayName, bio, pfp);
+       
+        const pfpUrl = req.file.secure_url || req.file.path;
+        console.log("Cloudinary Upload Result:", req.file);
+        console.log("Generated Image Path:", pfpUrl);
+        const profile = await db.createProfile(Number(userId), bio, pfpUrl);
 
         console.log("profile created:", profile);
         res.json(profile);
@@ -49,20 +56,24 @@ async function updateProfile(req, res) {
     try {
         const profileId = req.params.id;
         console.log("Profile id:  ", profileId);
-        const { displayName, bio, pfp } = req.body;
+        const { bio } = req.body;
 
         // const profile = await db.getProfileById(profileId);
         const updateData = {};
 
-        if (displayName !== undefined) updateData.displayName = displayName;
+        const pfpUrl = req.file.secure_url || req.file.path;
         if (bio !== undefined) updateData.bio = bio;
-        if (pfp !== undefined) updateData.pfp = pfp;
+        if (pfpUrl !== undefined) updateData.pfpUrl = pfp;
 
         if (Object.keys(updateData).length === 0) {
             return res.json({ error: "No fields to update" });
         }
 
-        const newProfile = await db.updateProfile(Number(profileId), displayName, bio, pfp);
+        const newProfile = await db.updateProfile(
+            Number(profileId),
+            bio,
+            pfpUrl,
+        );
         return res.json(newProfile);
     } catch (err) {
         console.error("error: ", err);

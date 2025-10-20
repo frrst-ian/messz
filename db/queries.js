@@ -27,25 +27,23 @@ async function getUserByEmail(email) {
 }
 
 async function getConversations(userId) {
-    const conversations =  await prisma.conversation.findMany({
+    const conversations = await prisma.conversation.findMany({
         where: {
             userId: userId,
         },
         include: {
             participant: true,
-            messages: 
-                true
-            
+            messages: true,
         },
         orderBy: { createdAt: "desc" },
     });
 
-     return conversations.map(conv => ({
+    return conversations.map((conv) => ({
         ...conv,
         unseenCount: conv.messages.filter(
-            m => m.senderId !== userId && !m.seen
+            (m) => m.senderId !== userId && !m.seen,
         ).length,
-        messages: conv.messages.slice(-1) 
+        messages: conv.messages.slice(-1),
     }));
 }
 
@@ -84,17 +82,6 @@ async function createConversation(userId, participantId) {
     return conv1;
 }
 
-// async function updateConversationStatus(conversationId) {
-//     return await prisma.message.update({
-//         where: {
-//             id: conversationId,
-//         },
-//         data: {
-//             seen: true,
-//         },
-//     });
-// }
-
 async function deleteConversation(conversationId) {
     return await prisma.conversation.delete({
         where: {
@@ -115,28 +102,25 @@ async function getProfileById(profileId) {
     });
 }
 
-async function createProfile(userId, displayName, bio, pfp) {
-    // console.log("bio: " , bio)
+async function createProfile(userId, bio, pfpUrl) {
     return await prisma.profile.create({
         data: {
             userId: userId,
-            displayName: displayName,
             bio: bio,
-            pfp: pfp,
+            pfpUrl: pfpUrl,
         },
     });
 }
 
-async function updateProfile(profileId, displayName, bio, pfp) {
+async function updateProfile(profileId, bio, pfpUrl) {
     console.log("profileId:", profileId);
     return await prisma.profile.update({
         where: {
             id: profileId,
         },
         data: {
-            displayName: displayName,
             bio: bio,
-            pfp: pfp,
+            pfpUrl: pfpUrl,
         },
     });
 }
@@ -183,9 +167,9 @@ async function markMessagesAsSeen(conversationId, userId) {
         where: {
             conversationId: conversationId,
             senderId: { not: userId },
-            seen: false
+            seen: false,
         },
-        data: { seen: true }
+        data: { seen: true },
     });
 }
 
@@ -202,5 +186,5 @@ module.exports = {
     createProfile,
     getProfiles,
     createMessage,
-    markMessagesAsSeen
+    markMessagesAsSeen,
 };
