@@ -5,7 +5,7 @@ async function getConversations(req, res) {
     try {
         const userId = req.user.id;
         const conversations = await db.getConversations(userId);
-        console.log("convos: ", conversations);
+        // console.log("convos: ", conversations);
         return res.json(conversations);
     } catch (err) {
         console.error("Error: ", err);
@@ -16,9 +16,14 @@ async function getConversations(req, res) {
 async function createConversation(req, res) {
     try {
         const userId = req.user.id;
-        console.log("userId: ", userId);
+        // console.log("userId: ", userId);
         const { participantId } = req.body;
-        console.log("participantId: ", participantId);
+        // console.log("participantId: ", participantId);
+
+        const existing = await db.getConversationById(userId, participantId);
+        if (existing) {
+            return res.json(existing);
+        }
 
         const conversation = await db.createConversation(
             Number(userId),
@@ -35,47 +40,18 @@ async function getConversationById(req, res) {
     try {
         const userId = req.user.id;
 
-        const { participantId } = req.body;
+        const participantId = req.query.participantId;
         req.params.id = participantId;
 
-        console.log("participantId: ", participantId);
+        // console.log("participantId: ", participantId);
 
-        const conversation = await db.getConversationById(
-            userId,
-            participantId,
-        );
-        console.log("convo: ", conversation);
-        return res.json(conversation);
-    } catch (err) {
-        console.error("Error: ", err);
-        res.status(500).json({ error: "Internal Server Error" });
-    }
-}
-
-async function updateConversationStatus(req, res) {
-    try {
-        const userId = req.user.id;
-        console.log("userId: ", userId);
-        const { participantId } = req.body;
-        console.log("participantId: ", participantId);
-
-        const { seen } = req.body;
 
         const conversation = await db.getConversationById(
             Number(userId),
             Number(participantId),
         );
-        console.log("convo: ", conversation);
-
-        if (!seen) {
-            const updatedConversaton = await db.updateConversationStatus(
-                Number(conversation.id),
-            );
-            console.log("updated convo: ", updatedConversaton);
-
-            return res.json(updatedConversaton);
-        }
-
+        await db.markMessagesAsSeen(conversation.id, userId);
+        // console.log("convo: ", conversation);
         return res.json(conversation);
     } catch (err) {
         console.error("Error: ", err);
@@ -86,9 +62,9 @@ async function updateConversationStatus(req, res) {
 async function deleteConversation(req, res) {
     try {
         const userId = req.user.id;
-        console.log("userId: ", userId);
+        // console.log("userId: ", userId);
         const { participantId } = req.body;
-        console.log("participantId: ", participantId);
+        // console.log("participantId: ", participantId);
 
         const conversation = await db.getConversationById(
             Number(userId),
@@ -98,7 +74,7 @@ async function deleteConversation(req, res) {
 
         await db.deleteConversation(Number(conversation.id));
 
-        const conversations = db.getConversations(userId);
+        const conversations = await db.getConversations(userId);
         return res.json(conversations);
     } catch (err) {
         console.error("Error: ", err);
@@ -130,7 +106,6 @@ module.exports = {
     getConversations,
     createConversation,
     getConversationById,
-    updateConversationStatus,
     deleteConversation,
     createMessage,
 };

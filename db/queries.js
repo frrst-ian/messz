@@ -26,21 +26,27 @@ async function getUserByEmail(email) {
     });
 }
 
-async function getConversations(userId, participantId) {
-    return await prisma.conversation.findMany({
+async function getConversations(userId) {
+    const conversations =  await prisma.conversation.findMany({
         where: {
-            OR: [{ userId: userId }, { participantId: participantId }],
+            userId: userId,
         },
         include: {
-            user: true,
             participant: true,
-            messages: {
-                orderBy: { sentAt: "desc" },
-                take: 1,
-            },
+            messages: 
+                true
+            
         },
         orderBy: { createdAt: "desc" },
     });
+
+     return conversations.map(conv => ({
+        ...conv,
+        unseenCount: conv.messages.filter(
+            m => m.senderId !== userId && !m.seen
+        ).length,
+        messages: conv.messages.slice(-1) 
+    }));
 }
 
 async function getConversationById(userId, participantId) {
@@ -53,31 +59,41 @@ async function getConversationById(userId, participantId) {
         },
         include: {
             messages: {
-                orderBy: { sentAt: "desc" },
+                include: { sender: true },
+                orderBy: { sentAt: "asc" },
             },
         },
     });
 }
 
 async function createConversation(userId, participantId) {
-    return await prisma.conversation.create({
+    const conv1 = await prisma.conversation.create({
         data: {
             userId: userId,
             participantId: participantId,
         },
     });
-}
 
-async function updateConversationStatus(conversationId) {
-    return await prisma.conversation.update({
-        where: {
-            id: conversationId,
-        },
+    await prisma.conversation.create({
         data: {
-            seen: true,
+            userId: participantId,
+            participantId: userId,
         },
     });
+
+    return conv1;
 }
+
+// async function updateConversationStatus(conversationId) {
+//     return await prisma.message.update({
+//         where: {
+//             id: conversationId,
+//         },
+//         data: {
+//             seen: true,
+//         },
+//     });
+// }
 
 async function deleteConversation(conversationId) {
     return await prisma.conversation.delete({
@@ -126,22 +142,50 @@ async function updateProfile(profileId, displayName, bio, pfp) {
 }
 
 async function createMessage(content, conversationId, senderId) {
-    return await prisma.message.create({
+    const conv = await prisma.conversation.findUnique({
+        where: { id: conversationId },
+        select: { userId: true, participantId: true },
+    });
+
+    const reverseConv = await prisma.conversation.findUnique({
+        where: {
+            userId_participantId: {
+                userId: conv.participantId,
+                participantId: conv.userId,
+            },
+        },
+    });
+
+    const message = await prisma.message.create({
         data: {
             conversationId: conversationId,
             content: content,
             senderId: senderId,
         },
-        include: {
-            sender: {
-                select: {
-                    id: true,
-                    fullName: true,
-                    email: true,
-                },
+        include: { sender: true, conversation: true },
+    });
+
+    if (reverseConv) {
+        await prisma.message.create({
+            data: {
+                conversationId: reverseConv.id,
+                content: content,
+                senderId: senderId,
             },
-            conversation: true,
+        });
+    }
+
+    return message;
+}
+
+async function markMessagesAsSeen(conversationId, userId) {
+    return await prisma.message.updateMany({
+        where: {
+            conversationId: conversationId,
+            senderId: { not: userId },
+            seen: false
         },
+        data: { seen: true }
     });
 }
 
@@ -152,11 +196,11 @@ module.exports = {
     getConversations,
     getConversationById,
     createConversation,
-    updateConversationStatus,
     deleteConversation,
     getProfileById,
     updateProfile,
     createProfile,
     getProfiles,
     createMessage,
+    markMessagesAsSeen
 };

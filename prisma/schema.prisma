@@ -1,6 +1,7 @@
 generator client {
   provider = "prisma-client-js"
   output   = "../generated/prisma"
+  // seed    = "prisma/seed.js" 
 }
 
 datasource db {
@@ -28,8 +29,6 @@ model Conversation {
   participantId  Int
   participant    User      @relation(fields: [participantId], references: [id], name: "participant", onDelete: Cascade)
   messages       Message[]
-  seen           Boolean   @default(false)
-  unseenMessages Int       @default(0)
   createdAt      DateTime  @default(now())
 
   @@unique([userId, participantId])
@@ -44,6 +43,7 @@ model Message {
   sender          User         @relation(fields: [senderId], references: [id])
   content         String
   sentAt          DateTime     @default(now())
+  seen           Boolean   @default(false)
 
   @@map("message")
 }
@@ -54,5 +54,5 @@ model Profile {
   pfp        String?
   bio        String?
   userId     Int     @unique
-  profile    User    @relation(fields: [userId], references: [id])
+  user    User    @relation(fields: [userId], references: [id])
 }
