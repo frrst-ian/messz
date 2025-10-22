@@ -1,7 +1,7 @@
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
-const multer = require("multer")
+const multer = require("multer");
 
 const app = express();
 
@@ -29,12 +29,7 @@ app.use(
         },
         credentials: true,
         methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-        allowedHeaders: [
-            "Origin",
-            "Content-Type",
-            "Accept",
-            "Authorization",
-        ],
+        allowedHeaders: ["Origin", "Content-Type", "Accept", "Authorization"],
         optionsSuccessStatus: 200,
     }),
 );
@@ -46,10 +41,10 @@ app.use("/api/conversations", conversationRouter);
 app.use("/api/profile", profileRouter);
 
 app.use((err, req, res, next) => {
-  if (err instanceof multer.MulterError) {
-    return res.status(400).send(`File upload error: ${err.message}`);
-  }
-  res.status(500).send(err.message);
+    if (err instanceof multer.MulterError) {
+        return res.status(400).send(`File upload error: ${err.message}`);
+    }
+    res.status(500).send(err.message);
 });
 
 app.listen(3000, () => {

@@ -24,7 +24,7 @@ async function getUserByEmail(email) {
             email: email,
         },
         include: {
-            Profile:true
+            Profile: true,
         },
     });
 }
@@ -105,6 +105,9 @@ async function getProfileById(profileId) {
     return await prisma.profile.findUnique({
         where: {
             id: profileId,
+        },
+        include: {
+            user: true,
         },
     });
 }

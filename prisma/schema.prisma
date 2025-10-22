@@ -23,36 +23,36 @@ model User {
 }
 
 model Conversation {
-  id             Int       @id @default(autoincrement())
-  userId         Int
-  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  participantId  Int
-  participant    User      @relation(fields: [participantId], references: [id], name: "participant", onDelete: Cascade)
-  messages       Message[]
-  createdAt      DateTime  @default(now())
+  id            Int       @id @default(autoincrement())
+  userId        Int
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  participantId Int
+  participant   User      @relation(fields: [participantId], references: [id], name: "participant", onDelete: Cascade)
+  messages      Message[]
+  createdAt     DateTime  @default(now())
 
   @@unique([userId, participantId])
   @@map("conversation")
 }
 
 model Message {
-  id              Int          @id @default(autoincrement())
+  id             Int          @id @default(autoincrement())
   conversationId Int
-  conversation    Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
-  senderId        Int
-  sender          User         @relation(fields: [senderId], references: [id])
-  content         String
-  sentAt          DateTime     @default(now())
-  seen           Boolean   @default(false)
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  senderId       Int
+  sender         User         @relation(fields: [senderId], references: [id])
+  content        String
+  sentAt         DateTime     @default(now())
+  seen           Boolean      @default(false)
 
   @@map("message")
 }
 
 model Profile {
-  id         Int     @id @default(autoincrement())
-  pfpUrl        String?
-  bio        String?
-  userId     Int     @unique
-  user    User    @relation(fields: [userId], references: [id])
-  createdAt      DateTime  @default(now())
+  id        Int      @id @default(autoincrement())
+  pfpUrl    String?
+  bio       String?
+  userId    Int      @unique
+  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
 }
