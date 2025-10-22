@@ -30,13 +30,13 @@ async function postRegister(req, res) {
 
         return res.status(201).json({
             token,
-            user: { id: user.id, name: user.name, email: user.email },
+            user: { id: user.id, name: user.fullName, email: user.email },
         });
     } catch (err) {
-        if(err.code === "P2002" && err.meta?.target?.includes("email")) {
+        if (err.code === "P2002" && err.meta?.target?.includes("email")) {
             return res.status(400).json({
-                errors: ['Email already exist']
-            })
+                errors: ["Email already exist"],
+            });
         }
         console.error("Registration err:  ", err);
         res.status(500).json({ error: "Internal Server Errror" });
@@ -76,10 +76,17 @@ async function postLogin(req, res) {
                     process.env.JWT_SECRET,
                     { expiresIn: "7d" },
                 );
-
+                console.log("user: info: ", user);
                 return res.json({
                     token,
-                    user: { id: user.id, name: user.name, email: user.email },
+                    user: {
+                        id: user.id,
+                        name: user.name,
+                        email: user.email,
+                    },
+                    profile: {
+                        pfpUrl: user.Profile.pfpUrl
+                    }
                 });
             },
         )(req, res);

@@ -23,6 +23,9 @@ async function getUserByEmail(email) {
         where: {
             email: email,
         },
+        include: {
+            Profile:true
+        },
     });
 }
 
@@ -91,7 +94,11 @@ async function deleteConversation(conversationId) {
 }
 
 async function getProfiles() {
-    return await prisma.profile.findMany();
+    return await prisma.profile.findMany({
+        include: {
+            user: true,
+        },
+    });
 }
 
 async function getProfileById(profileId) {

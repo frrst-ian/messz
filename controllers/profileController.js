@@ -33,8 +33,8 @@ async function getProfileById(req, res) {
 async function createProfile(req, res) {
     try {
         const userId = req.user.id;
-        console.log("req : ", req);
-        console.log("req.body: ", req.body);
+        // console.log("req : ", req);
+        // console.log("req.body: ", req.body);
         
         const { bio } = req.body;
         // console.log("body: ", req.body);
