@@ -33,7 +33,7 @@ async function getProfileById(req, res) {
 async function createProfile(req, res) {
     try {
         const userId = req.user.id;
-
+        console.log("req.body: ", req.body);
         const { bio } = req.body;
 
         const pfpUrl = req.file.secure_url || req.file.path;
@@ -41,7 +41,7 @@ async function createProfile(req, res) {
         // console.log("Generated Image Path:", pfpUrl);
         const profile = await db.createProfile(Number(userId), bio, pfpUrl);
 
-        // console.log("profile created:", profile);
+        console.log("profile created:", profile);
         res.json(profile);
     } catch (err) {
         console.error("Error: ", err);
@@ -53,7 +53,7 @@ async function updateProfile(req, res) {
     try {
         const profileId = req.params.id;
         console.log("Profile id:  ", profileId);
-        console.log("req.body: ", req.body);
+        // console.log("req.body: ", req.body);
         const { bio } = req.body;
 
         // const profile = await db.getProfileById(profileId);
@@ -61,7 +61,7 @@ async function updateProfile(req, res) {
 
         const pfpUrl = req.file?.secure_url || req.file?.path;
         if (bio !== undefined) updateData.bio = bio;
-        if (pfpUrl !== undefined) updateData.pfpUrl = pfp;
+        if (pfpUrl !== undefined) updateData.pfpUrl = pfpUrl;
 
         if (Object.keys(updateData).length === 0) {
             return res.json({ error: "No fields to update" });

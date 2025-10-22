@@ -85,7 +85,8 @@ async function postLogin(req, res) {
                         email: user.email,
                     },
                     profile: {
-                        pfpUrl: user.Profile.pfpUrl
+                        pfpUrl: user.Profile.pfpUrl,
+                        pfpId: user.Profile.id
                     }
                 });
             },

@@ -8,10 +8,15 @@ profileRouter.get("/", authenticateJwt, profileController.getProfiles);
 profileRouter.get("/:id", authenticateJwt, profileController.getProfileById);
 profileRouter.post(
     "/",
-    upload.single('pfpUrl'),
+    upload.single("pfpUrl"),
     authenticateJwt,
     profileController.createProfile,
 );
-profileRouter.put("/:id", authenticateJwt, profileController.updateProfile);
+profileRouter.put(
+    "/:id",
+    upload.single("pfpUrl"),
+    authenticateJwt,
+    profileController.updateProfile,
+);
 
 module.exports = profileRouter;
