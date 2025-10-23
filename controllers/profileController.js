@@ -3,7 +3,6 @@ const db = require("../db/queries");
 async function getProfiles(req, res) {
     try {
         const profiles = await db.getProfiles();
-        console.log("Profiles:  ", profiles);
         res.json(profiles);
     } catch (err) {
         console.error("Error: ", err);
@@ -14,12 +13,10 @@ async function getProfiles(req, res) {
 async function getProfileById(req, res) {
     try {
         const profileId = req.params.id;
-        console.log("Profile Id: ", profileId);
         if (isNaN(profileId)) {
             return res.status(400).json({ error: "400 Bad Request" });
         }
         const profile = await db.getProfileById(Number(profileId));
-        console.log("Profile:  ", profile);
         if (profile === null) {
             return res.status(404).json({ error: "404 Profile Not Found" });
         }
@@ -33,7 +30,6 @@ async function getProfileById(req, res) {
 async function createProfile(req, res) {
     try {
         const userId = req.user.id;
-        console.log("req.body: ", req.body);
         const { bio } = req.body;
 
         const pfpUrl = req.file.secure_url || req.file.path;
@@ -41,7 +37,6 @@ async function createProfile(req, res) {
         // console.log("Generated Image Path:", pfpUrl);
         const profile = await db.createProfile(Number(userId), bio, pfpUrl);
 
-        console.log("profile created:", profile);
         res.json(profile);
     } catch (err) {
         console.error("Error: ", err);
@@ -52,7 +47,6 @@ async function createProfile(req, res) {
 async function updateProfile(req, res) {
     try {
         const profileId = req.params.id;
-        console.log("Profile id:  ", profileId);
         // console.log("req.body: ", req.body);
         const { bio } = req.body;
 

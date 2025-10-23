@@ -76,7 +76,6 @@ async function postLogin(req, res) {
                     process.env.JWT_SECRET,
                     { expiresIn: "7d" },
                 );
-                console.log("user: info: ", user);
                 return res.json({
                     token,
                     user: {

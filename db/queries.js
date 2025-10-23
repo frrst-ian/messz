@@ -50,13 +50,10 @@ async function getConversations(userId) {
     }));
 }
 
-async function getConversationById(userId, participantId) {
+async function getConversationById(conversationId) {
     return await prisma.conversation.findUnique({
         where: {
-            userId_participantId: {
-                userId: userId,
-                participantId: participantId,
-            },
+            id: conversationId,
         },
         include: {
             messages: {
@@ -66,6 +63,23 @@ async function getConversationById(userId, participantId) {
         },
     });
 }
+
+// async function getConversationById(userId, participantId) {
+//     return await prisma.conversation.findUnique({
+//         where: {
+//             userId_participantId: {
+//                 userId: userId,
+//                 participantId: participantId,
+//             },
+//         },
+//         include: {
+//             messages: {
+//                 include: { sender: true },
+//                 orderBy: { sentAt: "asc" },
+//             },
+//         },
+//     });
+// }
 
 async function createConversation(userId, participantId) {
     const conv1 = await prisma.conversation.create({

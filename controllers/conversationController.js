@@ -5,7 +5,6 @@ async function getConversations(req, res) {
     try {
         const userId = req.user.id;
         const conversations = await db.getConversations(userId);
-        // console.log("convos: ", conversations);
         return res.json(conversations);
     } catch (err) {
         console.error("Error: ", err);
@@ -16,9 +15,7 @@ async function getConversations(req, res) {
 async function createConversation(req, res) {
     try {
         const userId = req.user.id;
-        // console.log("userId: ", userId);
         const { participantId } = req.body;
-        // console.log("participantId: ", participantId);
 
         const existing = await db.getConversationById(userId, participantId);
         if (existing) {
@@ -35,23 +32,58 @@ async function createConversation(req, res) {
         res.status(500).json({ error: "Internal Server Error" });
     }
 }
-
 async function getConversationById(req, res) {
+    try {
+        const userId = req.user.id
+        const conversationId = Number(req.params.id);
+
+        const conversation = await db.getConversationById(conversationId);
+        await db.markMessagesAsSeen(conversation.id, userId);
+        return res.json(conversation);
+    } catch (err) {
+        console.error("Error: ", err);
+        res.status(500).json({ error: "Internal Server Error" });
+    }
+}
+
+// async function getConversationById(req, res) {
+//     try {
+//         const userId = req.user.id;
+
+//         const participantId = req.query.participantId;
+
+//         const conversation = await db.getConversationById(
+//             Number(userId),
+//             Number(participantId),
+//         );
+//         await db.markMessagesAsSeen(conversation.id, userId);
+//         return res.json(conversation);
+//     } catch (err) {
+//         console.error("Error: ", err);
+//         res.status(500).json({ error: "Internal Server Error" });
+//     }
+// }
+
+async function getConversationById2(req, res) {
     try {
         const userId = req.user.id;
 
         const participantId = req.query.participantId;
-        req.params.id = participantId;
-
-        // console.log("participantId: ", participantId);
-
 
         const conversation = await db.getConversationById(
             Number(userId),
             Number(participantId),
         );
+
+        if (!conversation) {
+            const newConvo = await db.createConversation(
+                Number(userId),
+                Number(participantId),
+            );
+            return res.json(newConvo);
+        }
+
         await db.markMessagesAsSeen(conversation.id, userId);
-        // console.log("convo: ", conversation);
         return res.json(conversation);
     } catch (err) {
         console.error("Error: ", err);
@@ -62,15 +94,12 @@ async function getConversationById(req, res) {
 async function deleteConversation(req, res) {
     try {
         const userId = req.user.id;
-        // console.log("userId: ", userId);
         const { participantId } = req.body;
-        // console.log("participantId: ", participantId);
 
         const conversation = await db.getConversationById(
             Number(userId),
             Number(participantId),
         );
-        console.log("convo: ", conversation);
 
         await db.deleteConversation(Number(conversation.id));
 
@@ -108,4 +137,5 @@ module.exports = {
     getConversationById,
     deleteConversation,
     createMessage,
+    getConversationById2,
 };
