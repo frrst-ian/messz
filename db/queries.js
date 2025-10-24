@@ -37,8 +37,17 @@ async function getConversations(userId) {
         },
         include: {
             messages: {
-                orderBy:{sentAt: "desc"},
+                orderBy: { sentAt: "desc" },
                 take: 1,
+                include: {
+                    sender: {
+                        select: {
+                            id: true,
+                            fullName: true,
+                            email: true,
+                        },
+                    },
+                },
             },
             _count: {
                 select: {
@@ -55,26 +64,56 @@ async function getConversations(userId) {
             createdAt: "desc",
         },
     });
+
     return conversations.sort((a, b) => {
-        b.messages[0]?.sentAt ??
-            b.createdAt.getTime() - a.messages[0]?.sentAt ??
-            a.createdAt.getTime();
+        const aTime = a.messages[0]?.sentAt?.getTime() ?? a.createdAt.getTime();
+        const bTime = b.messages[0]?.sentAt?.getTime() ?? b.createdAt.getTime();
+        return bTime - aTime;
     });
 }
 
-// async function getConversationById(conversationId) {
-//     return await prisma.conversation.findUnique({
-//         where: {
-//             id: conversationId,
-//         },
-//         include: {
-//             messages: {
-//                 include: { sender: true },
-//                 orderBy: { sentAt: "asc" },
-//             },
-//         },
-//     });
-// }
+async function getConversationById(convoId, userId) {
+    const conversation = await prisma.conversation.findFirst({
+        where: {
+            id: convoId,
+            participants: {
+                some: {
+                    userId: userId,
+                },
+            },
+        },
+        include: {
+            messages: {
+                include: {
+                    sender: {
+                        select: {
+                            id: true,
+                            email: true,
+                            pfpUrl: true,
+                        },
+                    },
+                },
+                orderBy: { sentAt: "asc" },
+            },
+            participants: {
+                where: {
+                    userId: { not: userId },
+                },
+                include: {
+                    user: {
+                        select: {
+                            id: true,
+                            fullName: true,
+                            pfpUrl: true,
+                        },
+                    },
+                },
+            },
+        },
+    });
+
+    return conversation;
+}
 
 // // async function getConversationById(userId, participantId) {
 // //     return await prisma.conversation.findUnique({
@@ -214,7 +253,7 @@ module.exports = {
     getUserById,
     getUserByEmail,
     getConversations,
-    // getConversationById,
+    getConversationById,
     // createConversation,
     // deleteConversation,
     // getProfileById,

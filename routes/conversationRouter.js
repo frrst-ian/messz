@@ -10,6 +10,13 @@ conversationRouter.get(
     conversationController.getConversations,
 );
 
+conversationRouter.get(
+    "/:id",
+    authenticateJwt,
+    conversationController.getConversationById,
+);
+
+
 // conversationRouter.post(
 //     "/",
 //     authenticateJwt,
@@ -20,11 +27,6 @@ conversationRouter.get(
 //     "/",
 //     authenticateJwt,
 //     conversationController.deleteConversation,
-// );
-// conversationRouter.get(
-//     "/:id",
-//     authenticateJwt,
-//     conversationController.getConversationById,
 // );
 // conversationRouter.post(
 //     "/:id/messages",

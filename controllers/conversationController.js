@@ -4,8 +4,23 @@ async function getConversations(req, res) {
     try {
         const userId = req.user.id;
         const conversations = await db.getConversations(userId);
-        console.log(conversations)
+        console.log(conversations);
         return res.json(conversations);
+    } catch (err) {
+        console.error("Error: ", err);
+        res.status(500).json({ error: "Internal Server Error" });
+    }
+}
+
+async function getConversationById(req, res) {
+    try {
+        const userId = req.user.id
+        const convoId = req.params.id;
+
+        const convoMessages = await db.getConversationById(convoId, userId);
+        // await db.markMessagesAsSeen(conversation.id, userId);
+        console.log("convoMessages: ", convoMessages);
+        return res.json(convoMessages);
     } catch (err) {
         console.error("Error: ", err);
         res.status(500).json({ error: "Internal Server Error" });
@@ -26,19 +41,6 @@ async function getConversations(req, res) {
 // //             Number(userId),
 // //             Number(participantId),
 // //         );
-// //         return res.json(conversation);
-// //     } catch (err) {
-// //         console.error("Error: ", err);
-// //         res.status(500).json({ error: "Internal Server Error" });
-// //     }
-// // }
-// // async function getConversationById(req, res) {
-// //     try {
-// //         const userId = req.user.id
-// //         const conversationId = Number(req.params.id);
-
-// //         const conversation = await db.getConversationById(conversationId);
-// //         await db.markMessagesAsSeen(conversation.id, userId);
 // //         return res.json(conversation);
 // //     } catch (err) {
 // //         console.error("Error: ", err);
@@ -134,7 +136,7 @@ async function getConversations(req, res) {
 module.exports = {
     getConversations,
     // createConversation,
-    // getConversationById,
+    getConversationById,
     // deleteConversation,
     // createMessage,
     // getConversationById2,

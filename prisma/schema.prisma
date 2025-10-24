@@ -14,7 +14,8 @@ model User {
   email    String    @unique
   password String?
   messages Message[]
-  profile  Profile?
+  pfpUrl   String?
+  bio      String?
 
   conversationParticipants ConversationParticipant[]
 
@@ -56,15 +57,4 @@ model Message {
   sender       User         @relation(fields: [senderId], references: [id], onDelete: Cascade)
 
   @@map("message")
-}
-
-model Profile {
-  id        String   @id @default(uuid())
-  pfpUrl    String?
-  bio       String?
-  userId    String   @unique
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  createdAt DateTime @default(now())
-
-  @@map("profile")
 }
