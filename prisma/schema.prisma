@@ -1,7 +1,6 @@
 generator client {
   provider = "prisma-client-js"
   output   = "../generated/prisma"
-  // seed    = "prisma/seed.js" 
 }
 
 datasource db {
@@ -10,49 +9,62 @@ datasource db {
 }
 
 model User {
-  id                         Int            @id @default(autoincrement())
-  fullName                   String?
-  email                      String         @unique
-  password                   String?
-  conversations              Conversation[]
-  conversationsAsParticipant Conversation[] @relation(name: "participant")
-  messages                   Message[]
-  Profile                    Profile?
+  id       String    @id @default(uuid())
+  fullName String?
+  email    String    @unique
+  password String?
+  messages Message[]
+  profile  Profile?
+
+  conversationParticipants ConversationParticipant[]
 
   @@map("user")
 }
 
-model Conversation {
-  id            Int       @id @default(autoincrement())
-  userId        Int
-  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  participantId Int
-  participant   User      @relation(fields: [participantId], references: [id], name: "participant", onDelete: Cascade)
-  messages      Message[]
-  createdAt     DateTime  @default(now())
+model ConversationParticipant {
+  id             String @id @default(uuid())
+  userId         String
+  conversationId String
 
-  @@unique([userId, participantId])
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, conversationId])
+  @@map("conversation_participant")
+}
+
+model Conversation {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+
+  participants ConversationParticipant[]
+
+  messages Message[]
+
   @@map("conversation")
 }
 
 model Message {
-  id             Int          @id @default(autoincrement())
-  conversationId Int
-  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
-  senderId       Int
-  sender         User         @relation(fields: [senderId], references: [id])
+  id             String   @id @default(uuid())
+  conversationId String
+  senderId       String
   content        String
-  sentAt         DateTime     @default(now())
-  seen           Boolean      @default(false)
+  sentAt         DateTime @default(now())
+  seen           Boolean  @default(false)
+
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  sender       User         @relation(fields: [senderId], references: [id], onDelete: Cascade)
 
   @@map("message")
 }
 
 model Profile {
-  id        Int      @id @default(autoincrement())
+  id        String   @id @default(uuid())
   pfpUrl    String?
   bio       String?
-  userId    Int      @unique
-  user      User     @relation(fields: [userId], references: [id])
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
+
+  @@map("profile")
 }

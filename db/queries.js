@@ -23,54 +23,49 @@ async function getUserByEmail(email) {
         where: {
             email: email,
         },
-        include: {
-            Profile: true,
-        },
     });
 }
 
 async function getConversations(userId) {
     const conversations = await prisma.conversation.findMany({
         where: {
-            userId: userId,
-        },
-        include: {
-            participant: true,
-            messages: true,
-        },
-        orderBy: { createdAt: "desc" },
-    });
-
-    return conversations.map((conv) => ({
-        ...conv,
-        unseenCount: conv.messages.filter(
-            (m) => m.senderId !== userId && !m.seen,
-        ).length,
-        messages: conv.messages.slice(-1),
-    }));
-}
-
-async function getConversationById(conversationId) {
-    return await prisma.conversation.findUnique({
-        where: {
-            id: conversationId,
+            participants: {
+                some: {
+                    userId,
+                },
+            },
         },
         include: {
             messages: {
-                include: { sender: true },
-                orderBy: { sentAt: "asc" },
+                orderBy:{sentAt: "desc"},
+                take: 1,
+            },
+            _count: {
+                select: {
+                    messages: {
+                        where: {
+                            seen: false,
+                            senderId: { not: userId },
+                        },
+                    },
+                },
             },
         },
+        orderBy: {
+            createdAt: "desc",
+        },
+    });
+    return conversations.sort((a, b) => {
+        b.messages[0]?.sentAt ??
+            b.createdAt.getTime() - a.messages[0]?.sentAt ??
+            a.createdAt.getTime();
     });
 }
 
-// async function getConversationById(userId, participantId) {
+// async function getConversationById(conversationId) {
 //     return await prisma.conversation.findUnique({
 //         where: {
-//             userId_participantId: {
-//                 userId: userId,
-//                 participantId: participantId,
-//             },
+//             id: conversationId,
 //         },
 //         include: {
 //             messages: {
@@ -81,134 +76,151 @@ async function getConversationById(conversationId) {
 //     });
 // }
 
-async function createConversation(userId, participantId) {
-    const conv1 = await prisma.conversation.create({
-        data: {
-            userId: userId,
-            participantId: participantId,
-        },
-    });
+// // async function getConversationById(userId, participantId) {
+// //     return await prisma.conversation.findUnique({
+// //         where: {
+// //             userId_participantId: {
+// //                 userId: userId,
+// //                 participantId: participantId,
+// //             },
+// //         },
+// //         include: {
+// //             messages: {
+// //                 include: { sender: true },
+// //                 orderBy: { sentAt: "asc" },
+// //             },
+// //         },
+// //     });
+// // }
 
-    await prisma.conversation.create({
-        data: {
-            userId: participantId,
-            participantId: userId,
-        },
-    });
+// async function createConversation(userId, participantId) {
+//     const conv1 = await prisma.conversation.create({
+//         data: {
+//             userId: userId,
+//             participantId: participantId,
+//         },
+//     });
 
-    return conv1;
-}
+//     await prisma.conversation.create({
+//         data: {
+//             userId: participantId,
+//             participantId: userId,
+//         },
+//     });
 
-async function deleteConversation(conversationId) {
-    return await prisma.conversation.delete({
-        where: {
-            id: conversationId,
-        },
-    });
-}
+//     return conv1;
+// }
 
-async function getProfiles() {
-    return await prisma.profile.findMany({
-        include: {
-            user: true,
-        },
-    });
-}
+// async function deleteConversation(conversationId) {
+//     return await prisma.conversation.delete({
+//         where: {
+//             id: conversationId,
+//         },
+//     });
+// }
 
-async function getProfileById(profileId) {
-    return await prisma.profile.findUnique({
-        where: {
-            id: profileId,
-        },
-        include: {
-            user: true,
-        },
-    });
-}
+// async function getProfiles() {
+//     return await prisma.profile.findMany({
+//         include: {
+//             user: true,
+//         },
+//     });
+// }
 
-async function createProfile(userId, bio, pfpUrl) {
-    return await prisma.profile.create({
-        data: {
-            userId: userId,
-            bio: bio,
-            pfpUrl: pfpUrl,
-        },
-    });
-}
+// async function getProfileById(profileId) {
+//     return await prisma.profile.findUnique({
+//         where: {
+//             id: profileId,
+//         },
+//         include: {
+//             user: true,
+//         },
+//     });
+// }
 
-async function updateProfile(profileId, bio, pfpUrl) {
-    console.log("profileId:", profileId);
-    return await prisma.profile.update({
-        where: {
-            id: profileId,
-        },
-        data: {
-            bio: bio,
-            pfpUrl: pfpUrl,
-        },
-    });
-}
+// async function createProfile(userId, bio, pfpUrl) {
+//     return await prisma.profile.create({
+//         data: {
+//             userId: userId,
+//             bio: bio,
+//             pfpUrl: pfpUrl,
+//         },
+//     });
+// }
 
-async function createMessage(content, conversationId, senderId) {
-    const conv = await prisma.conversation.findUnique({
-        where: { id: conversationId },
-        select: { userId: true, participantId: true },
-    });
+// async function updateProfile(profileId, bio, pfpUrl) {
+//     console.log("profileId:", profileId);
+//     return await prisma.profile.update({
+//         where: {
+//             id: profileId,
+//         },
+//         data: {
+//             bio: bio,
+//             pfpUrl: pfpUrl,
+//         },
+//     });
+// }
 
-    const reverseConv = await prisma.conversation.findUnique({
-        where: {
-            userId_participantId: {
-                userId: conv.participantId,
-                participantId: conv.userId,
-            },
-        },
-    });
+// async function createMessage(content, conversationId, senderId) {
+//     const conv = await prisma.conversation.findUnique({
+//         where: { id: conversationId },
+//         select: { userId: true, participantId: true },
+//     });
 
-    const message = await prisma.message.create({
-        data: {
-            conversationId: conversationId,
-            content: content,
-            senderId: senderId,
-        },
-        include: { sender: true, conversation: true },
-    });
+//     const reverseConv = await prisma.conversation.findUnique({
+//         where: {
+//             userId_participantId: {
+//                 userId: conv.participantId,
+//                 participantId: conv.userId,
+//             },
+//         },
+//     });
 
-    if (reverseConv) {
-        await prisma.message.create({
-            data: {
-                conversationId: reverseConv.id,
-                content: content,
-                senderId: senderId,
-            },
-        });
-    }
+//     const message = await prisma.message.create({
+//         data: {
+//             conversationId: conversationId,
+//             content: content,
+//             senderId: senderId,
+//         },
+//         include: { sender: true, conversation: true },
+//     });
 
-    return message;
-}
+//     if (reverseConv) {
+//         await prisma.message.create({
+//             data: {
+//                 conversationId: reverseConv.id,
+//                 content: content,
+//                 senderId: senderId,
+//             },
+//         });
+//     }
 
-async function markMessagesAsSeen(conversationId, userId) {
-    return await prisma.message.updateMany({
-        where: {
-            conversationId: conversationId,
-            senderId: { not: userId },
-            seen: false,
-        },
-        data: { seen: true },
-    });
-}
+//     return message;
+// }
+
+// async function markMessagesAsSeen(conversationId, userId) {
+//     return await prisma.message.updateMany({
+//         where: {
+//             conversationId: conversationId,
+//             senderId: { not: userId },
+//             seen: false,
+//         },
+//         data: { seen: true },
+//     });
+// }
 
 module.exports = {
     createUser,
     getUserById,
     getUserByEmail,
     getConversations,
-    getConversationById,
-    createConversation,
-    deleteConversation,
-    getProfileById,
-    updateProfile,
-    createProfile,
-    getProfiles,
-    createMessage,
-    markMessagesAsSeen,
+    // getConversationById,
+    // createConversation,
+    // deleteConversation,
+    // getProfileById,
+    // updateProfile,
+    // createProfile,
+    // getProfiles,
+    // createMessage,
+    // markMessagesAsSeen,
 };

@@ -7,7 +7,7 @@ const app = express();
 
 const authRouter = require("./routes/authRouter");
 const conversationRouter = require("./routes/conversationRouter");
-const profileRouter = require("./routes/profileRouter");
+// const profileRouter = require("./routes/profileRouter");
 
 app.use(
     cors({
@@ -38,7 +38,7 @@ app.use(express.json());
 
 app.use("/api/auth", authRouter);
 app.use("/api/conversations", conversationRouter);
-app.use("/api/profile", profileRouter);
+// app.use("/api/profile", profileRouter);
 
 app.use((err, req, res, next) => {
     if (err instanceof multer.MulterError) {

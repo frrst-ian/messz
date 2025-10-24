@@ -83,10 +83,6 @@ async function postLogin(req, res) {
                         name: user.name,
                         email: user.email,
                     },
-                    profile: {
-                        pfpUrl: user.Profile.pfpUrl,
-                        pfpId: user.Profile.id
-                    }
                 });
             },
         )(req, res);
