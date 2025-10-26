@@ -4,7 +4,6 @@ async function getConversations(req, res) {
     try {
         const userId = req.user.id;
         const conversations = await db.getConversations(userId);
-        console.log(conversations);
         return res.json(conversations);
     } catch (err) {
         console.error("Error: ", err);
@@ -19,7 +18,6 @@ async function getConversationById(req, res) {
 
         const convoMessages = await db.getConversationById(convoId, userId);
         // await db.markMessagesAsSeen(conversation.id, userId);
-        console.log("convoMessages: ", convoMessages);
         return res.json(convoMessages);
     } catch (err) {
         console.error("Error: ", err);

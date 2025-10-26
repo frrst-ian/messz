@@ -2,7 +2,6 @@ const db = require("../db/message_queries");
 
 async function sendMessage(req, res) {
     try {
-        console.log(" req.body: ",  req.body);
         const { content, convoId } = req.body;
         const userId = req.user.id;
 

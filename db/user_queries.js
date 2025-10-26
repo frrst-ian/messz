@@ -1,15 +1,14 @@
 const prisma = require("./prisma");
 
-async function getUsers(search) {
+async function getUsers(search, userId) {
     return await prisma.user.findMany({
-        where: search
-            ? {
-                  fullName: {
-                      contains: search,
-                      mode: "insensitive",
-                  },
-              }
-            : undefined,
+        where: {
+            id: { not: userId },
+            fullName: {
+                contains: search,
+                mode: "insensitive",
+            },
+        },
         orderBy: { createdAt: "desc" },
         take: 5,
     });

@@ -1,9 +1,10 @@
 const db = require("../db/user_queries");
 
-async function getUsers(req,res) {
+async function getUsers(req, res) {
+    const userId = req.user.id;
     const { search } = req.query;
 
-    const users = await db.getUsers(search);
+    const users = await db.getUsers(search, userId);
     return res.json(users);
 }
 
