@@ -17,11 +17,11 @@ conversationRouter.get(
 );
 
 
-// conversationRouter.post(
-//     "/",
-//     authenticateJwt,
-//     conversationController.createConversation,
-// );
+conversationRouter.post(
+    "/",
+    authenticateJwt,
+    conversationController.createConversation,
+);
 
 // conversationRouter.delete(
 //     "/",

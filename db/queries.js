@@ -59,6 +59,20 @@ async function getConversations(userId) {
                     },
                 },
             },
+            participants: {
+                where: {
+                    userId: { not: userId },
+                },
+                include: {
+                    user: {
+                        select: {
+                            id: true,
+                            fullName: true,
+                            pfpUrl: true,
+                        },
+                    },
+                },
+            },
         },
         orderBy: {
             createdAt: "desc",
@@ -115,127 +129,17 @@ async function getConversationById(convoId, userId) {
     return conversation;
 }
 
-// // async function getConversationById(userId, participantId) {
-// //     return await prisma.conversation.findUnique({
-// //         where: {
-// //             userId_participantId: {
-// //                 userId: userId,
-// //                 participantId: participantId,
-// //             },
-// //         },
-// //         include: {
-// //             messages: {
-// //                 include: { sender: true },
-// //                 orderBy: { sentAt: "asc" },
-// //             },
-// //         },
-// //     });
-// // }
+async function createConversation(userId, user2Id) {
+    const convo = await prisma.conversation.create({
+        data: {
+            participants: {
+                create: [{ userId: userId }, { userId: user2Id }],
+            },
+        },
+    });
 
-// async function createConversation(userId, participantId) {
-//     const conv1 = await prisma.conversation.create({
-//         data: {
-//             userId: userId,
-//             participantId: participantId,
-//         },
-//     });
-
-//     await prisma.conversation.create({
-//         data: {
-//             userId: participantId,
-//             participantId: userId,
-//         },
-//     });
-
-//     return conv1;
-// }
-
-// async function deleteConversation(conversationId) {
-//     return await prisma.conversation.delete({
-//         where: {
-//             id: conversationId,
-//         },
-//     });
-// }
-
-// async function getProfiles() {
-//     return await prisma.profile.findMany({
-//         include: {
-//             user: true,
-//         },
-//     });
-// }
-
-// async function getProfileById(profileId) {
-//     return await prisma.profile.findUnique({
-//         where: {
-//             id: profileId,
-//         },
-//         include: {
-//             user: true,
-//         },
-//     });
-// }
-
-// async function createProfile(userId, bio, pfpUrl) {
-//     return await prisma.profile.create({
-//         data: {
-//             userId: userId,
-//             bio: bio,
-//             pfpUrl: pfpUrl,
-//         },
-//     });
-// }
-
-// async function updateProfile(profileId, bio, pfpUrl) {
-//     console.log("profileId:", profileId);
-//     return await prisma.profile.update({
-//         where: {
-//             id: profileId,
-//         },
-//         data: {
-//             bio: bio,
-//             pfpUrl: pfpUrl,
-//         },
-//     });
-// }
-
-// async function createMessage(content, conversationId, senderId) {
-//     const conv = await prisma.conversation.findUnique({
-//         where: { id: conversationId },
-//         select: { userId: true, participantId: true },
-//     });
-
-//     const reverseConv = await prisma.conversation.findUnique({
-//         where: {
-//             userId_participantId: {
-//                 userId: conv.participantId,
-//                 participantId: conv.userId,
-//             },
-//         },
-//     });
-
-//     const message = await prisma.message.create({
-//         data: {
-//             conversationId: conversationId,
-//             content: content,
-//             senderId: senderId,
-//         },
-//         include: { sender: true, conversation: true },
-//     });
-
-//     if (reverseConv) {
-//         await prisma.message.create({
-//             data: {
-//                 conversationId: reverseConv.id,
-//                 content: content,
-//                 senderId: senderId,
-//             },
-//         });
-//     }
-
-//     return message;
-// }
+    return convo;
+}
 
 // async function markMessagesAsSeen(conversationId, userId) {
 //     return await prisma.message.updateMany({
@@ -254,7 +158,7 @@ module.exports = {
     getUserByEmail,
     getConversations,
     getConversationById,
-    // createConversation,
+    createConversation,
     // deleteConversation,
     // getProfileById,
     // updateProfile,
