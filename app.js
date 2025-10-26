@@ -8,7 +8,7 @@ const app = express();
 const authRouter = require("./routes/authRouter");
 const conversationRouter = require("./routes/conversationRouter");
 const messageRouter = require("./routes/messageRouter");
-// const profileRouter = require("./routes/profileRouter");
+const userRouter = require("./routes/userRouter");
 
 app.use(
     cors({
@@ -40,7 +40,7 @@ app.use(express.json());
 app.use("/api/auth", authRouter);
 app.use("/api/conversations", conversationRouter);
 app.use("/api/message", messageRouter);
-// app.use("/api/profile", profileRouter);
+app.use("/api/users", userRouter);
 
 app.use((err, req, res, next) => {
     if (err instanceof multer.MulterError) {

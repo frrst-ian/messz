@@ -9,14 +9,15 @@ datasource db {
 }
 
 model User {
-  id       String    @id @default(uuid())
-  fullName String?
-  email    String    @unique
-  password String?
-  messages Message[]
-  pfpUrl   String?
-  bio      String?
+  id        String   @id @default(uuid())
+  fullName  String?
+  email     String   @unique
+  password  String?
+  pfpUrl    String?
+  bio       String?
+  createdAt DateTime @default(now())
 
+  messages                 Message[]
   conversationParticipants ConversationParticipant[]
 
   @@map("user")

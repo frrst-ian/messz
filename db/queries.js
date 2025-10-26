@@ -129,16 +129,55 @@ async function getConversationById(convoId, userId) {
     return conversation;
 }
 
-async function createConversation(userId, user2Id) {
-    const convo = await prisma.conversation.create({
-        data: {
+async function createConversation(user1Id, user2Id) {
+    const existingConvo = await prisma.conversation.findFirst({
+        where: {
+            AND: [
+                { participants: { some: { userId: user1Id } } },
+                { participants: { some: { userId: user2Id } } },
+            ],
+        },
+        include: {
+            messages: {
+                include: {
+                    sender: {
+                        select: {
+                            id: true,
+                            email: true,
+                            pfpUrl: true,
+                        },
+                    },
+                },
+                orderBy: { sentAt: "asc" },
+            },
             participants: {
-                create: [{ userId: userId }, { userId: user2Id }],
+                where: {
+                    userId: { not: user1Id },
+                },
+                include: {
+                    user: {
+                        select: {
+                            id: true,
+                            fullName: true,
+                            pfpUrl: true,
+                        },
+                    },
+                },
             },
         },
     });
 
-    return convo;
+    if (existingConvo) {
+        return existingConvo;
+    } else {
+        return await prisma.conversation.create({
+            data: {
+                participants: {
+                    create: [{ userId: user1Id }, { userId: user2Id }],
+                },
+            },
+        });
+    }
 }
 
 // async function markMessagesAsSeen(conversationId, userId) {

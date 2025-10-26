@@ -29,16 +29,10 @@ async function getConversationById(req, res) {
 
 async function createConversation(req, res) {
     try {
-        const userId = req.user.id;
+        const user1Id = req.user.id;
         const { user2Id } = req.body;
 
-        const convoId = req.params.id;
-        const existingConvo = await db.getConversationById(convoId, userId);
-        if (existingConvo) {
-            return res.json(existingConvo);
-        }
-
-        const conversation = await db.createConversation(userId, user2Id);
+        const conversation = await db.createConversation(user1Id, user2Id);
         return res.json(conversation);
     } catch (err) {
         console.error("Error: ", err);
