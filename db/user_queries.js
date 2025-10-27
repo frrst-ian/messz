@@ -14,4 +14,15 @@ async function getUsers(search, userId) {
     });
 }
 
-module.exports = { getUsers };
+async function getUserById(id) {
+    return await prisma.user.findUnique({
+        where: { id: id },
+        select: {
+            fullName: true,
+            pfpUrl: true,
+            bio: true,
+        },
+    });
+}
+
+module.exports = { getUsers, getUserById };

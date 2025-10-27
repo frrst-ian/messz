@@ -8,4 +8,11 @@ async function getUsers(req, res) {
     return res.json(users);
 }
 
-module.exports = { getUsers };
+async function getUserById(req, res) {
+    const { id } = req.params;
+    
+    const user = await db.getUserById(id);
+    return res.json(user);
+}
+
+module.exports = { getUsers, getUserById };

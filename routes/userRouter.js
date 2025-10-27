@@ -10,4 +10,10 @@ userRouter.get(
     userController.getUsers,
 );
 
+userRouter.get(
+    "/:id",
+    authenticateJwt,
+    userController.getUserById,
+);
+
 module.exports = userRouter;
