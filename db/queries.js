@@ -1,11 +1,13 @@
 const prisma = require("./prisma");
 
-async function createUser(name, email, password) {
+async function createUser(name, email, password, bio, pfpUrl) {
     return await prisma.user.create({
         data: {
             fullName: name,
             email: email,
             password: password,
+            bio: bio,
+            pfpUrl: pfpUrl,
         },
     });
 }
@@ -198,11 +200,5 @@ module.exports = {
     getConversations,
     getConversationById,
     createConversation,
-    // deleteConversation,
-    // getProfileById,
-    // updateProfile,
-    // createProfile,
-    // getProfiles,
-    // createMessage,
     // markMessagesAsSeen,
 };

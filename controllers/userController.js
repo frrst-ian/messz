@@ -10,7 +10,7 @@ async function getUsers(req, res) {
 
 async function getUserById(req, res) {
     const { id } = req.params;
-    
+
     const user = await db.getUserById(id);
     return res.json(user);
 }

@@ -6,6 +6,7 @@ const { validationResult } = require("express-validator");
 
 async function postRegister(req, res) {
     try {
+        console.log("req.body: ", req.body);
         const errors = validationResult(req);
 
         if (!errors.isEmpty()) {
@@ -16,11 +17,21 @@ async function postRegister(req, res) {
             });
         }
 
-        const { name, email, password } = req.body;
+        const { name, email, password, bio } = req.body;
+
+        const pfpUrl = req.file.secure_url || req.file.path;
+        console.log("Cloudinary Upload Result:", req.file);
+        console.log("Generated Image Path:", pfpUrl);
 
         saltedPassword = await bcrypt.hash(password, 12);
 
-        const user = await db.createUser(name, email, saltedPassword);
+        const user = await db.createUser(
+            name,
+            email,
+            saltedPassword,
+            bio,
+            pfpUrl,
+        );
 
         const token = jwt.sign(
             { userId: user.id, email: user.email },
@@ -30,7 +41,13 @@ async function postRegister(req, res) {
 
         return res.status(201).json({
             token,
-            user: { id: user.id, name: user.fullName, email: user.email },
+            user: {
+                id: user.id,
+                name: user.fullName,
+                email: user.email,
+                bio: user.bio,
+                pfpUrl: user.pfpUrl,
+            },
         });
     } catch (err) {
         if (err.code === "P2002" && err.meta?.target?.includes("email")) {
