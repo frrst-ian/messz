@@ -5,6 +5,8 @@ const multer = require("multer");
 
 const app = express();
 
+const PORT = process.env.PORT || 3000;
+
 const authRouter = require("./routes/authRouter");
 const conversationRouter = require("./routes/conversationRouter");
 const messageRouter = require("./routes/messageRouter");
@@ -50,6 +52,6 @@ app.use((err, req, res, next) => {
     res.status(500).send(err.message);
 });
 
-app.listen(3000, () => {
+app.listen(PORT, () => {
     console.log("Server is running on http://localhost:3000");
 });
