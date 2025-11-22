@@ -16,13 +16,11 @@ const userRouter = require("./routes/userRouter");
 const getAllowedOrigins = () => {
     if (NODE_ENV === "development") {
         return [
-            "http://localhost:3000",
-            "http://localhost:3001",
             "http://localhost:5173",
             "http://localhost:5174",
         ];
     }
-    return ["https://messz.onrender.com"];
+    return ["https://messz.netlify.app"];
 };
 
 app.use(
