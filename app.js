@@ -6,24 +6,31 @@ const multer = require("multer");
 const app = express();
 
 const PORT = process.env.PORT || 3000;
+const NODE_ENV = process.env.NODE_ENV || "development";
 
 const authRouter = require("./routes/authRouter");
 const conversationRouter = require("./routes/conversationRouter");
 const messageRouter = require("./routes/messageRouter");
 const userRouter = require("./routes/userRouter");
 
+const getAllowedOrigins = () => {
+    if (NODE_ENV === "development") {
+        return [
+            "http://localhost:3000",
+            "http://localhost:3001",
+            "http://localhost:5173",
+            "http://localhost:5174",
+        ];
+    }
+    return ["https://messz.onrender.com"];
+};
+
 app.use(
     cors({
         origin: function (origin, callback) {
             if (!origin) return callback(null, true);
 
-            const allowedOrigins = [
-                "http://localhost:3000",
-                "http://localhost:3001",
-                "http://localhost:5173",
-                "http://localhost:5174",
-                "https://messz.onrender.com"
-            ];
+            const allowedOrigins = getAllowedOrigins();
 
             if (allowedOrigins.includes(origin)) {
                 callback(null, true);
@@ -53,5 +60,5 @@ app.use((err, req, res, next) => {
 });
 
 app.listen(PORT, () => {
-    console.log("Server is running on http://localhost:3000");
+    console.log(`[${NODE_ENV}] Server on http://localhost:${PORT}`);
 });
