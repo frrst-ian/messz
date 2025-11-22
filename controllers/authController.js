@@ -6,7 +6,6 @@ const { validationResult } = require("express-validator");
 
 async function postRegister(req, res) {
     try {
-        console.log("req.body: ", req.body);
         const errors = validationResult(req);
 
         if (!errors.isEmpty()) {
@@ -20,8 +19,8 @@ async function postRegister(req, res) {
         const { name, email, password, bio } = req.body;
 
         const pfpUrl = req.file.secure_url || req.file.path;
-        console.log("Cloudinary Upload Result:", req.file);
-        console.log("Generated Image Path:", pfpUrl);
+        // console.log("Cloudinary Upload Result:", req.file);
+        // console.log("Generated Image Path:", pfpUrl);
 
         saltedPassword = await bcrypt.hash(password, 12);
 
@@ -84,7 +83,7 @@ async function postLogin(req, res) {
 
                 if (!user) {
                     return res.status(401).json({
-                        error: info?.message || "Invalid email or password",
+                        error: "Invalid email or password",
                     });
                 }
 
@@ -99,6 +98,8 @@ async function postLogin(req, res) {
                         id: user.id,
                         name: user.name,
                         email: user.email,
+                        bio: user.bio,
+                        pfpUrl: user.pfpUrl,
                     },
                 });
             },

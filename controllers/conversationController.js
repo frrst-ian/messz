@@ -4,7 +4,8 @@ async function getConversations(req, res) {
     try {
         const userId = req.user.id;
         const conversations = await db.getConversations(userId);
-        return res.json(conversations);
+        const conversationsWithMessages = conversations.filter(convo => convo.messages.length > 0)
+        return res.json(conversationsWithMessages);
     } catch (err) {
         console.error("Error: ", err);
         res.status(500).json({ error: "Internal Server Error" });
