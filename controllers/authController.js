@@ -19,8 +19,6 @@ async function postRegister(req, res) {
         const { name, email, password, bio } = req.body;
 
         const pfpUrl = req.file.secure_url || req.file.path;
-        // console.log("Cloudinary Upload Result:", req.file);
-        // console.log("Generated Image Path:", pfpUrl);
 
         saltedPassword = await bcrypt.hash(password, 12);
 
@@ -103,7 +101,7 @@ async function postLogin(req, res) {
                     },
                 });
             },
-        )(req, res);
+    )(req, res);
     } catch (err) {
         console.error("Error:", err);
         res.status(500).json({ error: "Internal Server Error" });
