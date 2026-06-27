@@ -1,5 +1,5 @@
 const passport = require("../config/passport");
-const passport = require("../config/cloudinary");
+const cloudinary = require("../config/cloudinary");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const db = require("../db/queries");
