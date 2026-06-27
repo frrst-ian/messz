@@ -50,6 +50,11 @@ app.use("/api/conversations", conversationRouter);
 app.use("/api/message", messageRouter);
 app.use("/api/users", userRouter);
 
+app.use("/api", (req, res) => {
+        return res.json({health:"Ok"})
+})
+
+
 app.use((err, req, res, next) => {
     if (err instanceof multer.MulterError) {
         return res.status(400).send(`File upload error: ${err.message}`);
