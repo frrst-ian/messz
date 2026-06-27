@@ -1,5 +1,4 @@
 const passport = require("../config/passport");
-const cloudinary = require("../config/cloudinary");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const db = require("../db/queries");
@@ -14,14 +13,7 @@ async function postRegister(req, res) {
 
         const { name, email, password, bio } = req.body;
 
-        let pfpUrl = null;
-        if (req.file) {
-            const result = await cloudinary.uploader.upload(req.file.path, {
-                folder: "messz/pfp",
-                public_id: `pfp-${Date.now()}`,
-            });
-            pfpUrl = result.secure_url;
-        }
+        let pfpUrl = req.file ? req.file.path : null;
 
         const saltedPassword = await bcrypt.hash(password, 12);
         const user = await db.createUser(name, email, saltedPassword, bio, pfpUrl);

@@ -15,10 +15,7 @@ const userRouter = require("./routes/userRouter");
 
 const getAllowedOrigins = () => {
     if (NODE_ENV === "development") {
-        return [
-            "http://localhost:5173",
-            "http://localhost:5174",
-        ];
+        return ["http://localhost:5173", "http://localhost:5174"];
     }
     return ["https://messz.netlify.app"];
 };
@@ -51,9 +48,8 @@ app.use("/api/message", messageRouter);
 app.use("/api/users", userRouter);
 
 app.use("/api", (req, res) => {
-        return res.json({health:"Ok"})
-})
-
+    return res.json({ health: "Ok" });
+});
 
 app.use((err, req, res, next) => {
     if (err instanceof multer.MulterError) {
